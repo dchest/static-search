@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf8">
+  <title>Search</title>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+<style>
+  .search-status {
+    color: #777;
+    margin-bottom: 12px;
+  }
+  #search-results {
+    padding: 0 20px;
+  }
+  #search-results > ul {
+    padding: 0;
+    list-style: none;
+  }
+  #search-results > ul > li {
+    padding-bottom: 12px;
+  }
+  .search-result-title {
+    font-size: 18px;
+  }
+  .search-result-url {
+    color: #3c763d;
+  }
+</style>
+</head>
+<body>
+
+  <div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="well" style="border-radius: 0">
+        <input id="search-field" type="text" class="form-control" autofocus placeholder="Search">
+      </div>
+      <div id="search-results"></div>
+    </div>
+  </div>
+  </div>
+
+<script src="underscore.min.js"></script>
+<script src="stemmer.min.js"></script>
+<script src="search.js"></script>
+<script src="searchindex.json"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() { 
+    StaticSearch.init(searchIndex)
+                .exclude([
+                  '/404.html',
+                  '/google7e5d29991a627bbc.html'
+                ])
+                .titleFormat(function(s) { return s.replace(/- Coding Robots$/, ''); })
+                .attach('#search-field', '#search-results');
+  });
+</script>
+</body>
