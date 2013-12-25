@@ -174,7 +174,8 @@ func main() {
 	}
 	t := time.Now()
 	n := 0
-	err := filepath.Walk(*fDir, func(path string, info os.FileInfo, err error) error {
+	dir := filepath.Clean(*fDir)
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -188,7 +189,7 @@ func main() {
 		if err != nil {
 			return err
 		}
-		url := cleanDocURL(filepath.ToSlash(path[len(*fDir):]))
+		url := cleanDocURL(filepath.ToSlash(path[len(dir):]))
 		err = indexHTMLDoc(url, f)
 		f.Close()
 		if err != nil {
