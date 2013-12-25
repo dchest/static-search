@@ -1,4 +1,9 @@
 /** @jsx React.DOM */
+/*!
+ * StaticSearch (c) 2013 Dmitry Chestnykh | BSD License
+ * https://github.com/dchest/static-search
+ */
+
 // <SearchStatus results>
 // results - array of search results.
 //

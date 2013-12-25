@@ -1,3 +1,7 @@
+/*!
+ * StaticSearch (c) 2013 Dmitry Chestnykh | BSD License
+ * https://github.com/dchest/static-search
+ */
 var StaticSearch = (function() {
 
   var STOP_WORDS = {};
