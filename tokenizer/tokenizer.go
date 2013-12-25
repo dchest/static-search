@@ -1,3 +1,5 @@
+// Package tokenizer declares interface for tokenizing input,
+// and implements a words tokenizer.
 package tokenizer
 
 // Tokenizer is an interface for tokenizers.
