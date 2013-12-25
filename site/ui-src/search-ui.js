@@ -21,26 +21,27 @@ var SearchStatus = React.createClass({
 //
 var SearchPagination = React.createClass({
   render: function () {
-    var createItem = _.bind(function(text, num) {
+    var props = this.props;
+    var createItem = function(text, num) {
       var className = React.addons.classSet({
-        'active': (num === this.props.pageNum),
-        'disabled': (num < 1 || num > this.props.pageCount)
+        'active': (num === props.pageNum),
+        'disabled': (num < 1 || num > props.pageCount)
       });
-      var tryNavigate = _.bind(function () {
-        if (num >= 1 && num <= this.props.pageCount) {
-          this.props.onNavigate(num);
+      var tryNavigate = function () {
+        if (num >= 1 && num <= props.pageCount) {
+          props.onNavigate(num);
         }
-      }, this);
+      };
       return <li className={className}>
-               <a href="javascript:;" onClick={tryNavigate}>{text}</a>
-             </li>
-    }, this);
+      <a href="javascript:;" onClick={tryNavigate}>{text}</a>
+      </li>
+    };
     var items = [];
-    items.push(createItem('«', this.props.pageNum-1));
+    items.push(createItem('«', props.pageNum-1));
     for (var i = 1; i <= this.props.pageCount; i++) {
       items.push(createItem(i, i));
     }
-    items.push(createItem('»', this.props.pageNum+1));
+    items.push(createItem('»', props.pageNum+1));
     return <ul className='pagination'>{items}</ul>
   }
 });
@@ -65,6 +66,11 @@ var SearchResults = React.createClass({
     },
 
     render: function() {
+      var allResults = this.props.results || [];
+      var pageCount = Math.ceil(allResults.length / this.resultsPerPage);
+      var pageResults = allResults.slice((this.state.pageNum-1)*this.resultsPerPage,
+                                         (this.state.pageNum-1)*this.resultsPerPage + this.resultsPerPage);
+
       var createResult = function(res) {
         return <li>
                  <div className='search-result-title'>
@@ -75,11 +81,6 @@ var SearchResults = React.createClass({
                  </div>
                </li>
       }
-      var allResults = this.props.results || [];
-      var pageCount = Math.ceil(allResults.length / this.resultsPerPage);
-      var pageResults = allResults.slice((this.state.pageNum-1)*this.resultsPerPage,
-                                         (this.state.pageNum-1)*this.resultsPerPage + this.resultsPerPage);
-
       var createPagination = _.bind(function() {
         if (pageCount > 1) {
           return <SearchPagination pageNum={this.state.pageNum}
@@ -106,12 +107,6 @@ var Search = React.createClass({
   },
 
   componentDidMount: function() {
-    StaticSearch.init(searchIndex)
-                .exclude([
-                  '/404.html',
-                  '/google7e5d29991a627bbc.html'
-                ])
-                .titleFormat(function(s) { return s.replace(/- Coding Robots$/, ''); });
   },
 
   onQueryChange: function(e) {
@@ -119,22 +114,21 @@ var Search = React.createClass({
   },
 
   render: function() {
-    var createSearchResults = _.bind(function() {
-             return this.state.query ? <SearchResults results={this.state.results}> : '';
-    }, this);
-
+    var searchResults = this.state.query
+                          ? <SearchResults results={this.state.results} />
+                          : '';
     return <div>
               <input type='search'
                      className='form-control search-query'
                      placeholder='Search'
                      value={this.state.query}
                      onChange={this.onQueryChange} />
-               {createSearchResults()}
+               {searchResults}
            </div>
   }
 
 });
 
-_.each(document.getElementsByClassName('search-component'), function (el) {
-  React.renderComponent(Search({}), el);
-});
+function AttachSearchUI(element) {
+  React.renderComponent(Search({}), element);
+}

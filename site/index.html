@@ -3,33 +3,8 @@
 <head>
   <meta charset="utf8">
   <title>Search</title>
-<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
-<style>
-  .search-query {
-    margin-top: 20px;
-  }
-  .search-results {
-    padding: 20px 0;
-  }
-  .search-results > ul {
-    padding: 0;
-    list-style: none;
-  }
-  .search-results > ul > li {
-    padding-bottom: 12px;
-  }
-  .search-status {
-    color: #777;
-    margin-bottom: 12px;
-  }
-  .search-result-title {
-    font-size: 18px;
-  }
-  .search-result-url {
-    color: #3c763d;
-  }
-</style>
+  <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+  <link rel="stylesheet" href="search-ui.css">
 </head>
 <body>
 
@@ -44,10 +19,27 @@
     </div>
   </div>
 
+<!-- Load libraries -->
 <script src="js/underscore.min.js"></script>
 <script src="js/stemmer.min.js"></script>
 <script src="js/search.js"></script>
 <script src="js/react-with-addons.min.js"></script>
-<script src="searchindex.json"></script>
 <script src="js/search-ui.js"></script>
+
+<!-- Load search index -->
+<script src="data/search-index.js"></script>
+
+<!-- Init search and attach UI -->
+<script>
+  StaticSearch.init(searchIndex)
+    .exclude([
+      '/404.html',
+      '/google7e5d29991a627bbc.html'
+    ])
+    .titleFormat(function(s) { return s.replace(/- Coding Robots$/, ''); });
+
+  _.each(document.getElementsByClassName('search-component'), function(el) {
+    AttachSearchUI(el);
+  });  
+</script>
 </body>

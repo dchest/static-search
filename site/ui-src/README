@@ -1,0 +1,4 @@
+Source directory for React.js components.
+Compile (npm install -g react-tools):
+
+$ jsx ui-src/ js/

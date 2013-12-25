@@ -1,0 +1,3 @@
+Put searchindex.js in this directory:
+
+$ static-search -d /path/to/website -o data/search-index.js -var searchIndex

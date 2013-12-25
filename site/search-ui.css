@@ -1,0 +1,29 @@
+.search-query {
+  margin-top: 20px;
+}
+
+.search-results {
+  padding: 20px 0;
+}
+
+.search-results > ul {
+  padding: 0;
+  list-style: none;
+}
+
+.search-results > ul > li {
+  padding-bottom: 12px;
+}
+
+.search-status {
+  color: #777;
+  margin-bottom: 12px;
+}
+
+.search-result-title {
+  font-size: 18px;
+}
+
+.search-result-url {
+  color: #3c763d;
+}

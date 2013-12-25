@@ -21,26 +21,27 @@ var SearchStatus = React.createClass({displayName: 'SearchStatus',
 //
 var SearchPagination = React.createClass({displayName: 'SearchPagination',
   render: function () {
-    var createItem = _.bind(function(text, num) {
+    var props = this.props;
+    var createItem = function(text, num) {
       var className = React.addons.classSet({
-        'active': (num === this.props.pageNum),
-        'disabled': (num < 1 || num > this.props.pageCount)
+        'active': (num === props.pageNum),
+        'disabled': (num < 1 || num > props.pageCount)
       });
-      var tryNavigate = _.bind(function () {
-        if (num >= 1 && num <= this.props.pageCount) {
-          this.props.onNavigate(num);
+      var tryNavigate = function () {
+        if (num >= 1 && num <= props.pageCount) {
+          props.onNavigate(num);
         }
-      }, this);
+      };
       return React.DOM.li( {className:className}, 
-               React.DOM.a( {href:"javascript:;", onClick:tryNavigate}, text)
-             )
-    }, this);
+      React.DOM.a( {href:"javascript:;", onClick:tryNavigate}, text)
+      )
+    };
     var items = [];
-    items.push(createItem('«', this.props.pageNum-1));
+    items.push(createItem('«', props.pageNum-1));
     for (var i = 1; i <= this.props.pageCount; i++) {
       items.push(createItem(i, i));
     }
-    items.push(createItem('»', this.props.pageNum+1));
+    items.push(createItem('»', props.pageNum+1));
     return React.DOM.ul( {className:"pagination"}, items)
   }
 });
@@ -65,6 +66,11 @@ var SearchResults = React.createClass({displayName: 'SearchResults',
     },
 
     render: function() {
+      var allResults = this.props.results || [];
+      var pageCount = Math.ceil(allResults.length / this.resultsPerPage);
+      var pageResults = allResults.slice((this.state.pageNum-1)*this.resultsPerPage,
+                                         (this.state.pageNum-1)*this.resultsPerPage + this.resultsPerPage);
+
       var createResult = function(res) {
         return React.DOM.li(null, 
                  React.DOM.div( {className:"search-result-title"}, 
@@ -75,11 +81,6 @@ var SearchResults = React.createClass({displayName: 'SearchResults',
                  )
                )
       }
-      var allResults = this.props.results || [];
-      var pageCount = Math.ceil(allResults.length / this.resultsPerPage);
-      var pageResults = allResults.slice((this.state.pageNum-1)*this.resultsPerPage,
-                                         (this.state.pageNum-1)*this.resultsPerPage + this.resultsPerPage);
-
       var createPagination = _.bind(function() {
         if (pageCount > 1) {
           return SearchPagination( {pageNum:this.state.pageNum,
@@ -106,12 +107,6 @@ var Search = React.createClass({displayName: 'Search',
   },
 
   componentDidMount: function() {
-    StaticSearch.init(searchIndex)
-                .exclude([
-                  '/404.html',
-                  '/google7e5d29991a627bbc.html'
-                ])
-                .titleFormat(function(s) { return s.replace(/- Coding Robots$/, ''); });
   },
 
   onQueryChange: function(e) {
@@ -119,20 +114,21 @@ var Search = React.createClass({displayName: 'Search',
   },
 
   render: function() {
-    return React.DOM.div({},
-             React.DOM.input({
-               type: 'search',
-               className: 'form-control search-query',
-               value: this.state.query,
-               placeholder: 'Search',
-               onChange: this.onQueryChange,
-             }),
-             this.state.query ? SearchResults({results: this.state.results}) : ''
-          )
+    var searchResults = this.state.query
+                          ? SearchResults( {results:this.state.results} )
+                          : '';
+    return React.DOM.div(null, 
+              React.DOM.input( {type:"search",
+                     className:"form-control search-query",
+                     placeholder:"Search",
+                     value:this.state.query,
+                     onChange:this.onQueryChange} ),
+               searchResults
+           )
   }
 
 });
 
-_.each(document.getElementsByClassName('search-component'), function (el) {
-  React.renderComponent(Search({}), el);
-});
+function AttachSearchUI(element) {
+  React.renderComponent(Search({}), element);
+}

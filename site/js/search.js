@@ -45,29 +45,27 @@ StaticSearch = (function() {
     return this;
   }
 
-  function titleFormat(v) {
+  function makeFormatter(name, v) {
     if (_.isFunction(v)) {
-      fmt.title = v;
+      fmt[name] = v;
     } else if (_.isString(v)) {
-      fmt.title = function (x) {
-        return _.template(v, {title: x});
+      fmt[name] = function (x) {
+        var data = {};
+        data[name] = x;
+        return _.template(v, data);
       };
     } else {
       throw 'expecting function or string';
     }
+  }
+
+  function titleFormat(v) {
+    makeFormatter('title', v);
     return this;
   }
 
   function urlFormat(v) {
-    if (_.isFunction(v)) {
-      fmt.url = v;
-    } else if (_.isString(v)) {
-      fmt.url = function (x) {
-        return _.template(v, {url: x});
-      };
-    } else {
-      throw 'expecting function or string';
-    }
+    makeFormatter('url', v);
     return this;
   }
 
@@ -121,56 +119,12 @@ StaticSearch = (function() {
             .value();
   }
 
-  var lazySearch = _.debounce(search, 100);
-
-  function format(results) {
-    if (!results || results.length == 0) {
-      return '<div class="search-status">No results found.</a>';
-    }
-    return _.template(
-           '<div class="search-status">' +
-           ' Found <%= results.length %> result<% if (results.length > 1) { print("s") } %>.' +
-           '</div>' +
-           '<ul><% _.each(results, function (r) { %>' +
-           ' <li>' +
-           '  <div class="search-result-title">' + 
-           '   <a href="<%= r.url %>"><%= r.title || r.url %></a>' +
-           '  </div>' +
-           '  <div class="search-result-url"><%= r.url %></div>' +
-           ' </li>' +
-           '<% }); %> </ul>',
-           {results: results, fmt: fmt});
-  }
-
-  function searchAndUpdate(query, targetElement) {
-    return targetElement.innerHTML = format(search(query));
-  }
-
-  var lazySearchAndUpdate = _.debounce(searchAndUpdate, 200);
-
-  function attach(inputElement, outputElement, noInstant) {
-    if (typeof inputElement == 'string') {
-      inputElement = document.querySelector(inputElement);
-    }
-    if (typeof outputElement == 'string') {
-      outputElement = document.querySelector(outputElement);
-    }
-    if (!noInstant) {
-      inputElement.addEventListener('keyup', function() { lazySearchAndUpdate(this.value, outputElement); });
-    }
-    inputElement.addEventListener('change', function() { searchAndUpdate(this.value, outputElement); });
-  }
-
   return {
-    search : search,
-    lazySearch : lazySearch,
-    searchAndUpdate : searchAndUpdate,
-    lazySearchAndUpdate : lazySearchAndUpdate,
     init: init,
     exclude: exclude,
-    attach: attach,
     urlFormat: urlFormat,
-    titleFormat: titleFormat
+    titleFormat: titleFormat,
+    search : search
   }
 
 })();
