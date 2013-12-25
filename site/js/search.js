@@ -41,7 +41,11 @@ var StaticSearch = (function() {
   function removeAccents(w) {
     var out = '', rep;
     for (var i = 0; i < w.length; i++) {
-      rep = ACCENTS[w.charCodeAt(i)];
+      c = w.charCodeAt(i);
+      if (c >= 768 && c <= 879) {
+        continue; // skip composed accent
+      }
+      rep = ACCENTS[c];
       out += rep ? rep : w.charAt(i);
     }
     return out;
@@ -85,10 +89,9 @@ var StaticSearch = (function() {
 
   StaticSearch.prototype.search = function(query) {
     var that = this;
-    var words = _.chain(query.match(/\w{2,}/g) || [])
+    var words = _.chain(removeAccents(query).match(/\w{2,}/g) || [])
                  .map(function (s) { return s.toLowerCase(); })
                  .reject(isStopWord)
-                 .map(removeAccents)
                  .map(stemmer)
                  .value();
     //console.log("Searching for", words);

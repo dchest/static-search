@@ -68,8 +68,11 @@ func addWord(word string, doc, count int) {
 
 func removeAccents(s string) string {
 	runes := []rune(s)
-	for i := 0; i < len(runes); i++ {
-		rep, ok := accentsMap[runes[i]]
+	for i, c := range runes {
+		if c >= 768 && c <= 879 {
+			continue // skip composed accent
+		}
+		rep, ok := accentsMap[c]
 		if ok {
 			runes[i] = rep
 		}
