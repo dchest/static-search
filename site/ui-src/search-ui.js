@@ -56,8 +56,6 @@ var SearchPagination = React.createClass({
 // results - array of search results.
 //
 var SearchResults = React.createClass({
-    resultsPerPage: 10,
-
     getInitialState: function() {
       return { pageNum: 1 };
     },
@@ -72,9 +70,9 @@ var SearchResults = React.createClass({
 
     render: function() {
       var allResults = this.props.results || [];
-      var pageCount = Math.ceil(allResults.length / this.resultsPerPage);
-      var pageResults = allResults.slice((this.state.pageNum-1)*this.resultsPerPage,
-                                         (this.state.pageNum-1)*this.resultsPerPage + this.resultsPerPage);
+      var pageCount = Math.ceil(allResults.length / this.props.resultsPerPage);
+      var pageResults = allResults.slice((this.state.pageNum-1)*this.props.resultsPerPage,
+                                         (this.state.pageNum-1)*this.props.resultsPerPage + this.props.resultsPerPage);
 
       var createResult = function(res) {
         return <li>
@@ -120,7 +118,8 @@ var Search = React.createClass({
 
   render: function() {
     var searchResults = this.state.query
-                          ? <SearchResults results={this.state.results} />
+                          ? <SearchResults results={this.state.results}
+                                           resultsPerPage={this.props.resultsPerPage} />
                           : '';
     return <div>
               <input type='search'
@@ -134,10 +133,13 @@ var Search = React.createClass({
 
 });
 
-function StaticSearchUI(elementOrQuery, searcher) {
+function StaticSearchUI(elementOrQuery, searcher, resultsPerPage) {
   _.each(_.isString(elementOrQuery) ?
            document.querySelectorAll(elementOrQuery)
          : [ element ], function(el) {
-           React.renderComponent(Search({searcher: searcher}), el);
+           React.renderComponent(Search({
+             searcher: searcher,
+             resultsPerPage: resultsPerPage || 10
+           }), el);
          });
 }
