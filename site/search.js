@@ -72,7 +72,8 @@ StaticSearch = (function() {
   }
 
   function search(query) {
-    var words = _.map(_.reject(query.match(/\w{2,}/g) || [], isStopWord), stemmer)
+    var words = _.map(_.reject(query.match(/\w{2,}/g) || [], isStopWord),
+                      function (s) { return stemmer(s.toLowerCase()); });
     //console.log("Searching for", words);
 
     var found = _.pick(searchIndex.words, words);
@@ -113,6 +114,7 @@ StaticSearch = (function() {
             .pluck(0) // extract document number without rank
             .map(function(v) { return searchIndex.docs[v]; })
             .reject(function (v) { return excludedURLs[v.url] })
+            .map(function (v) { return {title: fmt.title(v.title), url: fmt.url(v.url)}; })
             .value();
   }
 
@@ -129,9 +131,9 @@ StaticSearch = (function() {
            '<ul><% _.each(results, function (r) { %>' +
            ' <li>' +
            '  <div class="search-result-title">' + 
-           '   <a href="<%= fmt.url(r.url) %>"><%= fmt.title(r.title || fmt.url(r.url)) %></a>' +
+           '   <a href="<%= r.url %>"><%= r.title || r.url %></a>' +
            '  </div>' +
-           '  <div class="search-result-url"><%= fmt.url(r.url) %></div>' +
+           '  <div class="search-result-url"><%= r.url %></div>' +
            ' </li>' +
            '<% }); %> </ul>',
            {results: results, fmt: fmt});
