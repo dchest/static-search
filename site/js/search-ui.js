@@ -57,8 +57,8 @@ var SearchPagination = React.createClass({displayName: 'SearchPagination',
 
 
 // <SearchResult title url>
-// title - title string
-// url - URL string
+// title - result title.
+// url - result URL.
 //
 var SearchResult = React.createClass({displayName: 'SearchResult',
   render: function() {
@@ -75,8 +75,9 @@ var SearchResult = React.createClass({displayName: 'SearchResult',
   }
 });
 
-// <SearchResults results>
+// <SearchResults results resultsPerPage>
 // results - array of search results.
+// resultsPerPage - how many results per page to show.
 //
 var SearchResults = React.createClass({displayName: 'SearchResults',
     getInitialState: function() {
@@ -125,7 +126,9 @@ var SearchResults = React.createClass({displayName: 'SearchResults',
 });
 
 
-// <Search>
+// <Search searcher resultsPerPage>
+// searcher - instance of StaticSearch.
+// resultsPerPage - how many search results per page to show.
 //
 var Search = React.createClass({displayName: 'Search',
 
