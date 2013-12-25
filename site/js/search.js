@@ -72,8 +72,11 @@ StaticSearch = (function() {
   }
 
   function search(query) {
-    var words = _.map(_.reject(query.match(/\w{2,}/g) || [], isStopWord),
-                      function (s) { return stemmer(s.toLowerCase()); });
+    var words = _.chain(query.match(/\w{2,}/g) || [])
+                 .map(function (s) { return s.toLowerCase(); })
+                 .reject(isStopWord)
+                 .map(stemmer)
+                 .value();
     //console.log("Searching for", words);
 
     var found = _.pick(searchIndex.words, words);
