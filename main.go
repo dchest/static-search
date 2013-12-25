@@ -34,12 +34,22 @@ var documents = make([]*Doc, 0)
 // Index maps stemmed word to [doc, count] or just doc if count is 1.
 var index = make(map[string][]interface{})
 
-var stopWords = make(map[string]interface{})
+var (
+	stopWords  = make(map[string]interface{})
+	accentsMap = make(map[rune]rune)
+)
 
 func init() {
+	// Stop words map.
 	var present interface{}
 	for _, v := range stopWordList {
 		stopWords[v] = present
+	}
+	// Accents map.
+	for _, v := range accents {
+		for _, r := range v.runes {
+			accentsMap[r] = v.rep
+		}
 	}
 }
 
@@ -54,6 +64,17 @@ func addWord(word string, doc, count int) {
 	} else {
 		index[word] = append(index[word], [2]int{doc, count})
 	}
+}
+
+func removeAccents(s string) string {
+	runes := []rune(s)
+	for i := 0; i < len(runes); i++ {
+		rep, ok := accentsMap[runes[i]]
+		if ok {
+			runes[i] = rep
+		}
+	}
+	return string(runes)
 }
 
 func extractHTMLText(r io.Reader) (text string, title string, err error) {
@@ -117,7 +138,7 @@ func indexHTMLDoc(name string, r io.Reader) error {
 		if len(w) < 2 || isStopWord(w) {
 			continue
 		}
-		wordcnt[porter2.Stemmer.Stem(w)]++
+		wordcnt[porter2.Stemmer.Stem(removeAccents(w))]++
 	}
 	// Add words from title with more weight.
 	tk = tokenizer.Words(title)
@@ -126,7 +147,7 @@ func indexHTMLDoc(name string, r io.Reader) error {
 		if len(w) < 2 || isStopWord(w) {
 			continue
 		}
-		wordcnt[porter2.Stemmer.Stem(w)] += 10
+		wordcnt[porter2.Stemmer.Stem(removeAccents(w))] += 10
 	}
 	for w, n := range wordcnt {
 		addWord(w, doc, n)
@@ -388,4 +409,20 @@ var stopWordList = []string{
 	"yours",
 	"yourself",
 	"yourselves",
+}
+
+var accents = []struct {
+	runes []rune
+	rep   rune
+}{
+	{[]rune{'à', 'á', 'â', 'ã', 'ä', 'å'}, 'a'},
+	{[]rune{'æ'}, 'a'}, // ae, but we need one rune
+	{[]rune{'ç'}, 'c'},
+	{[]rune{'è', 'é', 'ê', 'ë'}, 'e'},
+	{[]rune{'ì', 'í', 'î', 'ï'}, 'i'},
+	{[]rune{'ñ'}, 'n'},
+	{[]rune{'ò', 'ó', 'ô', 'õ', 'ö'}, 'o'},
+	{[]rune{'œ'}, 'o'}, // oe, but we need one rune
+	{[]rune{'ù', 'ú', 'û', 'ü'}, 'u'},
+	{[]rune{'ý', 'ÿ'}, 'y'},
 }

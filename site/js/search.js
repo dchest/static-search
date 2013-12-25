@@ -31,6 +31,22 @@ var StaticSearch = (function() {
 
   function isStopWord(w) { return !!STOP_WORDS[w]; }
 
+  var ACCENTS = {
+    224 : 'a', 225 : 'a', 226 : 'a', 227 : 'a', 228 : 'a', 229 : 'a', 230 : 'a',
+    231 : 'c', 232 : 'e', 233 : 'e', 234 : 'e', 235 : 'e', 236 : 'i', 237 : 'i',
+    238 : 'i', 239 : 'i', 241 : 'n', 242 : 'o', 243 : 'o', 244 : 'o', 245 : 'o',
+    246 : 'o', 339 : 'o', 249 : 'u', 250 : 'u', 251 : 'u', 252 : 'u', 253 : 'y',
+    255 : 'y'};
+
+  function removeAccents(w) {
+    var out = '', rep;
+    for (var i = 0; i < w.length; i++) {
+      rep = ACCENTS[w.charCodeAt(i)];
+      out += rep ? rep : w.charAt(i);
+    }
+    return out;
+  }
+
   var StaticSearch = function(index, options) {
     if (!index)
       throw 'Please provide a search index.';
@@ -72,6 +88,7 @@ var StaticSearch = (function() {
     var words = _.chain(query.match(/\w{2,}/g) || [])
                  .map(function (s) { return s.toLowerCase(); })
                  .reject(isStopWord)
+                 .map(removeAccents)
                  .map(stemmer)
                  .value();
     //console.log("Searching for", words);
