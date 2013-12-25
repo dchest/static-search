@@ -106,11 +106,11 @@ var Search = React.createClass({
     return {query: "", results: []};
   },
 
-  componentDidMount: function() {
-  },
-
   onQueryChange: function(e) {
-    this.setState({query: e.target.value, results : StaticSearch.search(e.target.value)});
+    this.setState({
+      query: e.target.value,
+      results : this.props.searcher.search(e.target.value)
+    });
   },
 
   render: function() {
@@ -129,6 +129,10 @@ var Search = React.createClass({
 
 });
 
-function AttachSearchUI(element) {
-  React.renderComponent(Search({}), element);
+function StaticSearchUI(elementOrQuery, searcher) {
+  _.each(_.isString(elementOrQuery) ?
+           document.querySelectorAll(elementOrQuery)
+         : [ element ], function(el) {
+           React.renderComponent(Search({searcher: searcher}), el);
+         });
 }

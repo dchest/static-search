@@ -31,15 +31,13 @@
 
 <!-- Init search and attach UI -->
 <script>
-  StaticSearch.init(searchIndex)
-    .exclude([
+  var searcher = new StaticSearch(searchIndex, {
+    titleFormat: function(s) { return s.replace(/- Coding Robots$/, ''); },
+    exclude: [
       '/404.html',
       '/google7e5d29991a627bbc.html'
-    ])
-    .titleFormat(function(s) { return s.replace(/- Coding Robots$/, ''); });
-
-  _.each(document.getElementsByClassName('search-component'), function(el) {
-    AttachSearchUI(el);
-  });  
+    ]
+  });
+  StaticSearchUI('.search-component', searcher);
 </script>
 </body>

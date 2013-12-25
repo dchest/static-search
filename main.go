@@ -141,7 +141,7 @@ func writeIndex(w io.Writer) error {
 
 var (
 	fDir = flag.String("d", "", "root directory with documents")
-	fOut = flag.String("o", "searchindex.json", "output file")
+	fOut = flag.String("o", "search-index.json", "output file")
 	fVar = flag.String("var", "", "(optional) JavaScript variable to assign index object to")
 )
 
