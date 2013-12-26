@@ -51,31 +51,10 @@ var StaticSearch = (function() {
     return out;
   }
 
-  var StaticSearch = function(index, options) {
-    if (!index)
-      throw 'Please provide a search index.';
-
-    this._titleFormat = (options && typeof options.titleFormat !== 'undefined') ?
-                         this._makeFormatter('title', options.titleFormat)
-                         : function(x) { return x; };
-
-    this._urlFormat = (options && typeof options.urlFormat !== 'undefined') ?
-                       this._makeFormatter('url', options.urlFormat)
-                       : function(x) { return x; };
-
-    this._exclude = {};
-    var that = this;
-    if (options && typeof options.exclude !== 'undefined') {
-      if (_.isString(options.exclude)) {
-        this._exclude[options.exclude] = true;
-      } else {
-        _.each(options.exclude, function(u) { that._exclude[u] = true; });
-      }
-    }
-  };
-
-  StaticSearch.prototype._makeFormatter = function(name, v) {
-    if (_.isFunction(v)) {
+  function makeFormatter(name, v) {
+    if (!v) {
+      return function(x) { return x; }
+    } else if (_.isFunction(v)) {
       return v;
     } else if (_.isString(v)) {
       return function(x) {
@@ -85,6 +64,26 @@ var StaticSearch = (function() {
       };
     }
     throw 'expecting function or string';
+  };
+
+  var StaticSearch = function(index, options) {
+    if (!index)
+      throw 'Please provide a search index.';
+
+    options || (options = {});
+
+    this._titleFormat = makeFormatter('title', options.titleFormat);
+    this._urlFormat = makeFormatter('url', options.urlFormat);
+
+    var that = this;
+    this._exclude = {};
+    if (options.exclude) {
+      if (_.isString(options.exclude)) {
+        this._exclude[options.exclude] = true;
+      } else {
+        _.each(options.exclude, function(u) { that._exclude[u] = true; });
+      }
+    }
   };
 
   StaticSearch.prototype.search = function(query) {
