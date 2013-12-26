@@ -133,7 +133,7 @@ var SearchResults = React.createClass({displayName: 'SearchResults',
 var Search = React.createClass({displayName: 'Search',
 
   getInitialState: function() {
-    return {query: "", results: []};
+    return {query: '', results: []};
   },
 
   onQueryChange: function(e) {

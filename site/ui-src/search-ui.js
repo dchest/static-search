@@ -41,7 +41,7 @@ var SearchPagination = React.createClass({
       };
       return (
         <li className={classes}>
-          <a href="javascript:;" onClick={handleNavigate}>{text}</a>
+          <a href='javascript:;' onClick={handleNavigate}>{text}</a>
         </li>
       );
     };
@@ -133,7 +133,7 @@ var SearchResults = React.createClass({
 var Search = React.createClass({
 
   getInitialState: function() {
-    return {query: "", results: []};
+    return {query: '', results: []};
   },
 
   onQueryChange: function(e) {
