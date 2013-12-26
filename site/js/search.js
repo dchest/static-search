@@ -136,8 +136,8 @@ var StaticSearch = (function() {
             .reject(function(v) { return that._exclude[v.url]; })
             .map(function(v) {
               return {
-                title: that._titleFormat(v.title),
-                url: that._urlFormat(v.url)
+                title: that._titleFormat(v.t),
+                url: that._urlFormat(v.u)
               };
              })
             .value();
