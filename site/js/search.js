@@ -27,7 +27,7 @@ var StaticSearch = (function() {
     "while", "who", "who's", "whom", "why", "why's", "with", "won't",
     "would", "wouldn't", "you", "you'd", "you'll", "you're", "you've",
     "your", "yours", "yourself", "yourselves"
-  ], function (w) { STOP_WORDS[w] = true; });
+  ], function(w) { STOP_WORDS[w] = true; });
 
   function isStopWord(w) { return !!STOP_WORDS[w]; }
 
@@ -57,11 +57,11 @@ var StaticSearch = (function() {
 
     this._titleFormat = (options && typeof options.titleFormat !== 'undefined') ?
                          this._makeFormatter('title', options.titleFormat)
-                         : function (x) { return x; };
+                         : function(x) { return x; };
 
     this._urlFormat = (options && typeof options.urlFormat !== 'undefined') ?
                        this._makeFormatter('url', options.urlFormat)
-                       : function (x) { return x; };
+                       : function(x) { return x; };
 
     this._exclude = {};
     var that = this;
@@ -69,7 +69,7 @@ var StaticSearch = (function() {
       if (_.isString(options.exclude)) {
         this._exclude[options.exclude] = true;
       } else {
-        _.each(options.exclude, function (u) { that._exclude[u] = true; });
+        _.each(options.exclude, function(u) { that._exclude[u] = true; });
       }
     }
   };
@@ -78,7 +78,7 @@ var StaticSearch = (function() {
     if (_.isFunction(v)) {
       return v;
     } else if (_.isString(v)) {
-      return function (x) {
+      return function(x) {
         var data = {};
         data[name] = x;
         return _.template(v, data);
@@ -90,11 +90,11 @@ var StaticSearch = (function() {
   StaticSearch.prototype.search = function(query) {
     var that = this;
     var words = _.chain(removeAccents(query).match(/\w{2,}/g) || [])
-                 .map(function (s) { return s.toLowerCase(); })
+                 .map(function(s) { return s.toLowerCase(); })
                  .reject(isStopWord)
                  .map(stemmer)
                  .value();
-    //console.log("Searching for", words);
+    //console.log('Searching for', words);
 
     var found = _.pick(searchIndex.words, words);
     //console.log(found);
@@ -111,7 +111,7 @@ var StaticSearch = (function() {
     docs = _.chain(docs)
             .pairs()
             .filter(function(p) { return p[1] >= words.length - 1; }) // allow 1 miss
-            .map(function (p) { return +p[0]; })
+            .map(function(p) { return +p[0]; })
             .value();
     //console.log(docs);
 
@@ -120,7 +120,7 @@ var StaticSearch = (function() {
     _.each(found, function(arr) {
       _.each(arr, function(dc) {
         var d = _.isNumber(dc) ? dc : dc[0];
-        if (_.contains(docs, d)) { 
+        if (_.contains(docs, d)) {
           var r = _.isNumber(dc) ? 1 : dc[1];
           ranksByDoc[d] = (ranksByDoc[d] || 0) + r;
         }
@@ -133,9 +133,12 @@ var StaticSearch = (function() {
             .sortBy(function(p) { return -p[1]; }) // sort by rank
             .pluck(0) // extract document number without rank
             .map(function(v) { return searchIndex.docs[v]; })
-            .reject(function (v) { return that._exclude[v.url]; })
-            .map(function (v) {
-              return {title: that._titleFormat(v.title), url: that._urlFormat(v.url)};
+            .reject(function(v) { return that._exclude[v.url]; })
+            .map(function(v) {
+              return {
+                title: that._titleFormat(v.title),
+                url: that._urlFormat(v.url)
+              };
              })
             .value();
   };
