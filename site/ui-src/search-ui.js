@@ -12,6 +12,7 @@ var SearchStatus = React.createClass({
     var plural = function(s, c) {
       return c == 1 ? s : s + 's';
     };
+    var msg;
     if (this.props.count > 0) {
       msg = 'Found ' + this.props.count + plural(' result', this.props.count);
     } else {
