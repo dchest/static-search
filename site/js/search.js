@@ -133,7 +133,7 @@ var StaticSearch = (function() {
             .sortBy(function(p) { return -p[1]; }) // sort by rank
             .pluck(0) // extract document number without rank
             .map(function(v) { return searchIndex.docs[v]; })
-            .reject(function(v) { return that._exclude[v.url]; })
+            .reject(function(v) { return that._exclude[v.u]; })
             .map(function(v) {
               return {
                 title: that._titleFormat(v.t),
