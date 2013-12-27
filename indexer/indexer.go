@@ -13,20 +13,20 @@ import (
 )
 
 type Index struct {
-	Docs  []*document              `json:"docs"`
+	Docs  []*Document              `json:"docs"`
 	Words map[string][]interface{} `json:"words"`
 
 	HTMLTitleWeight int `json:"-"`
 }
 
-type document struct {
+type Document struct {
 	URL   string `json:"u"`
 	Title string `json:"t"`
 }
 
 func New() *Index {
 	return &Index{
-		Docs:            make([]*document, 0),
+		Docs:            make([]*Document, 0),
 		Words:           make(map[string][]interface{}),
 		HTMLTitleWeight: 10,
 	}
@@ -45,7 +45,7 @@ func (n *Index) addWord(word string, doc, weight int) {
 }
 
 func (n *Index) newDocument(url, title string) int {
-	n.Docs = append(n.Docs, &document{URL: url, Title: title})
+	n.Docs = append(n.Docs, &Document{URL: url, Title: title})
 	return len(n.Docs) - 1
 }
 
