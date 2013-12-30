@@ -31,6 +31,7 @@ const htmlTest = `<!doctype html>
 </head>
 <body>
  <div>
+   <img src="/some/image.png" alt="masterpiece">
    <p>This is a test.</p>
  </div>
 </body>
@@ -58,6 +59,7 @@ func TestAddHTML(t *testing.T) {
 		"green",
 		"day",
 		"yoohi",
+		"masterpiec",
 	})
 }
 

@@ -80,6 +80,7 @@ func (n *Index) AddHTML(url string, r io.Reader) error {
 	skipped := 0
 	inTitle := false
 	title := ""
+	var k, v []byte
 	for {
 		switch z.Next() {
 		case html.ErrorToken:
@@ -101,7 +102,6 @@ func (n *Index) AddHTML(url string, r io.Reader) error {
 				inTitle = true
 			case atom.Meta:
 				indexable := false
-				var k, v []byte
 				for hasAttr {
 					k, v, hasAttr = z.TagAttr()
 					value := strings.ToLower(string(v))
@@ -112,9 +112,17 @@ func (n *Index) AddHTML(url string, r io.Reader) error {
 						}
 					case atom.Content:
 						if indexable {
-							b.WriteString(value)
+							b.Write(v)
 							b.WriteString("\n")
 						}
+					}
+				}
+			case atom.Img:
+				for hasAttr {
+					k, v, hasAttr = z.TagAttr()
+					if atom.Lookup(k) == atom.Alt {
+						b.Write(v)
+						b.WriteString("\n")
 					}
 				}
 			}
