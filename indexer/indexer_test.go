@@ -19,18 +19,15 @@ func TestAddText(t *testing.T) {
 	if n.Docs[0].Title != title || n.Docs[0].URL != url {
 		t.Errorf("bad document: %v", n.Docs[0])
 	}
-	words := []string{"hey", "tri", "memoir"}
-	for _, w := range words {
-		if _, ok := n.Words[w]; !ok {
-			t.Errorf("word %q not index", w)
-		}
-	}
+	ensureIndexContains(t, n, []string{"hey", "tri", "memoir"})
 }
 
 const htmlTest = `<!doctype html>
 <html>
 <head>
   <title>Hello world</title>
+  <meta name="description" content="offspring">
+  <meta name="keywords" content="green day, yoohie">
 </head>
 <body>
  <div>
@@ -52,10 +49,36 @@ func TestAddHTML(t *testing.T) {
 	if n.Docs[0].Title != "Hello world" || n.Docs[0].URL != url {
 		t.Errorf("bad document: %v", n.Docs[0])
 	}
-	words := []string{"this", "test", "hello", "world"}
+	ensureIndexContains(t, n, []string{
+		"this",
+		"test",
+		"hello",
+		"world",
+		"offspr",
+		"green",
+		"day",
+		"yoohi",
+	})
+}
+
+func ensureIndexContains(t *testing.T, n *Index, words []string) {
 	for _, w := range words {
 		if _, ok := n.Words[w]; !ok {
 			t.Errorf("word %q not index", w)
 		}
 	}
+	wordsMap := mapFromStrings(words)
+	for w := range n.Words {
+		if _, ok := wordsMap[w]; !ok {
+			t.Errorf("extra word %q in index", w)
+		}
+	}
+}
+
+func mapFromStrings(a []string) map[string]bool {
+	m := make(map[string]bool, len(a))
+	for _, v := range a {
+		m[v] = true
+	}
+	return m
 }

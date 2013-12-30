@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"code.google.com/p/go.net/html"
+	"code.google.com/p/go.net/html/atom"
 	"github.com/dchest/stemmer/porter2"
 
 	"github.com/dchest/static-search/indexer/tokenizer"
@@ -76,12 +77,6 @@ func (n *Index) AddText(url, title string, r io.Reader) error {
 func (n *Index) AddHTML(url string, r io.Reader) error {
 	var b bytes.Buffer
 	z := html.NewTokenizer(r)
-	skipTag := func(tag string) bool {
-		if tag == "script" || tag == "style" {
-			return true
-		}
-		return false
-	}
 	skipped := 0
 	inTitle := false
 	title := ""
@@ -98,21 +93,37 @@ func (n *Index) AddHTML(url string, r io.Reader) error {
 			}
 			return err
 		case html.StartTagToken, html.SelfClosingTagToken:
-			tag, _ := z.TagName()
-			stag := string(tag)
-			if skipTag(stag) {
+			tag, hasAttr := z.TagName()
+			switch atom.Lookup(tag) {
+			case atom.Script, atom.Style:
 				skipped++
-			}
-			if stag == "title" {
+			case atom.Title:
 				inTitle = true
+			case atom.Meta:
+				indexable := false
+				var k, v []byte
+				for hasAttr {
+					k, v, hasAttr = z.TagAttr()
+					value := strings.ToLower(string(v))
+					switch atom.Lookup(k) {
+					case atom.Name:
+						if value == "keywords" || value == "description" {
+							indexable = true
+						}
+					case atom.Content:
+						if indexable {
+							b.WriteString(value)
+							b.WriteString("\n")
+						}
+					}
+				}
 			}
 		case html.EndTagToken:
 			tag, _ := z.TagName()
-			stag := string(tag)
-			if skipTag(stag) {
-				skipped--
-			}
-			if stag == "title" {
+			switch atom.Lookup(tag) {
+			case atom.Script, atom.Style:
+				skipped++
+			case atom.Title:
 				inTitle = false
 			}
 		case html.TextToken:
