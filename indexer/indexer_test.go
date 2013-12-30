@@ -24,6 +24,7 @@ func TestAddText(t *testing.T) {
 
 const htmlTest = `<!doctype html>
 <html>
+<script>alert(1)</script>
 <head>
   <title>Hello world</title>
   <meta name="description" content="offspring">

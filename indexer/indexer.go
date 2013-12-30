@@ -130,7 +130,7 @@ func (n *Index) AddHTML(url string, r io.Reader) error {
 			tag, _ := z.TagName()
 			switch atom.Lookup(tag) {
 			case atom.Script, atom.Style:
-				skipped++
+				skipped--
 			case atom.Title:
 				inTitle = false
 			}
