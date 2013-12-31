@@ -4,10 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"strings"
 
-	"code.google.com/p/go.net/html"
-	"code.google.com/p/go.net/html/atom"
 	"github.com/dchest/stemmer/porter2"
 
 	"github.com/dchest/static-search/indexer/tokenizer"
@@ -75,73 +72,12 @@ func (n *Index) AddText(url, title string, r io.Reader) error {
 }
 
 func (n *Index) AddHTML(url string, r io.Reader) error {
-	var b bytes.Buffer
-	z := html.NewTokenizer(r)
-	skipped := 0
-	inTitle := false
-	title := ""
-	var k, v []byte
-	for {
-		switch z.Next() {
-		case html.ErrorToken:
-			err := z.Err()
-			if err == io.EOF {
-				// Done
-				doc := n.newDocument(url, title)
-				n.addString(doc, title, n.HTMLTitleWeight)
-				n.addString(doc, b.String(), 1)
-				return nil
-			}
-			return err
-		case html.StartTagToken, html.SelfClosingTagToken:
-			tag, hasAttr := z.TagName()
-			switch atom.Lookup(tag) {
-			case atom.Script, atom.Style:
-				skipped++
-			case atom.Title:
-				inTitle = true
-			case atom.Meta:
-				indexable := false
-				for hasAttr {
-					k, v, hasAttr = z.TagAttr()
-					value := strings.ToLower(string(v))
-					switch atom.Lookup(k) {
-					case atom.Name:
-						if value == "keywords" || value == "description" {
-							indexable = true
-						}
-					case atom.Content:
-						if indexable {
-							b.Write(v)
-							b.WriteString("\n")
-						}
-					}
-				}
-			case atom.Img:
-				for hasAttr {
-					k, v, hasAttr = z.TagAttr()
-					if atom.Lookup(k) == atom.Alt {
-						b.Write(v)
-						b.WriteString("\n")
-					}
-				}
-			}
-		case html.EndTagToken:
-			tag, _ := z.TagName()
-			switch atom.Lookup(tag) {
-			case atom.Script, atom.Style:
-				skipped--
-			case atom.Title:
-				inTitle = false
-			}
-		case html.TextToken:
-			if inTitle {
-				title = strings.TrimSpace(string(z.Raw()))
-			}
-			if skipped == 0 {
-				b.Write(z.Raw())
-				b.WriteString("\n")
-			}
-		}
+	title, content, err := parseHTML(r)
+	if err != nil {
+		return err
 	}
+	doc := n.newDocument(url, title)
+	n.addString(doc, title, n.HTMLTitleWeight)
+	n.addString(doc, content, 1)
+	return nil
 }
