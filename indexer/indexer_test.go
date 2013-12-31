@@ -45,7 +45,7 @@ const htmlTest = `<!doctype html>
 func TestAddHTML(t *testing.T) {
 	n := New()
 	r := bytes.NewReader([]byte(htmlTest))
-	url := "http://www.codingrobots.com"
+	url := "http://www.codingrobots.com/memoires/"
 	if err := n.AddHTML(url, r); err != nil {
 		t.Fatal(err)
 	}
@@ -70,6 +70,9 @@ func TestAddHTML(t *testing.T) {
 		"masterpiec",
 		"link",
 		"roll",
+		"codingrobot",
+		"com",
+		"memoir",
 	})
 }
 

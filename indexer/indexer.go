@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"strings"
 
 	"github.com/dchest/stemmer/porter2"
 
@@ -14,7 +15,8 @@ type Index struct {
 	Docs  []*Document              `json:"docs"`
 	Words map[string][]interface{} `json:"words"`
 
-	HTMLTitleWeight int `json:"-"`
+	HTMLTitleWeight        int `json:"-"`
+	HTMLURLComponentWeight int `json:"-"`
 }
 
 type Document struct {
@@ -24,9 +26,10 @@ type Document struct {
 
 func New() *Index {
 	return &Index{
-		Docs:            make([]*Document, 0),
-		Words:           make(map[string][]interface{}),
-		HTMLTitleWeight: 10,
+		Docs:                   make([]*Document, 0),
+		Words:                  make(map[string][]interface{}),
+		HTMLTitleWeight:        3,
+		HTMLURLComponentWeight: 10,
 	}
 }
 
@@ -79,5 +82,17 @@ func (n *Index) AddHTML(url string, r io.Reader) error {
 	doc := n.newDocument(url, title)
 	n.addString(doc, title, n.HTMLTitleWeight)
 	n.addString(doc, content, 1)
+	// Add URL components.
+	// The farther the component, the less its weight.
+	url = strings.TrimPrefix(url, "http://")
+	url = strings.TrimPrefix(url, "https://")
+	url = strings.TrimPrefix(url, "www.")
+	for i, v := range strings.Split(url, "/") {
+		weight := n.HTMLURLComponentWeight / (i + 1)
+		if weight < 1 {
+			weight = 1
+		}
+		n.addString(doc, v, weight)
+	}
 	return nil
 }
