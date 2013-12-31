@@ -83,12 +83,16 @@ func (n *Index) AddHTML(url string, r io.Reader) error {
 	n.addString(doc, title, n.HTMLTitleWeight)
 	n.addString(doc, content, 1)
 	// Add URL components.
-	// The farther the component, the less its weight.
 	url = strings.TrimPrefix(url, "http://")
 	url = strings.TrimPrefix(url, "https://")
 	url = strings.TrimPrefix(url, "www.")
-	for i, v := range strings.Split(url, "/") {
-		weight := n.HTMLURLComponentWeight / (i + 1)
+	// The farther the component, the less its weight.
+	// Also, each components weight depends on the total number of them, so
+	// that "blog" in /blog/ weights more than in /blog/some-post/.
+	components := strings.Split(url, "/")
+	weight := n.HTMLURLComponentWeight / len(components)
+	for _, v := range components {
+		weight /= 2
 		if weight < 1 {
 			weight = 1
 		}
