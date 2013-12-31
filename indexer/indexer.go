@@ -28,7 +28,7 @@ func New() *Index {
 	return &Index{
 		Docs:                   make([]*Document, 0),
 		Words:                  make(map[string][]interface{}),
-		HTMLTitleWeight:        3,
+		HTMLTitleWeight:        10,
 		HTMLURLComponentWeight: 10,
 	}
 }
