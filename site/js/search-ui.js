@@ -18,7 +18,7 @@ var SearchStatus = React.createClass({displayName: 'SearchStatus',
     } else {
       msg = 'No results found';
     }
-    return React.DOM.div( {className:"search-status"}, msg);
+    return React.createElement("div", {className: "search-status"}, msg);
   }
 });
 
@@ -41,8 +41,8 @@ var SearchPagination = React.createClass({displayName: 'SearchPagination',
         }
       };
       return (
-        React.DOM.li( {className:classes}, 
-          React.DOM.a( {href:"javascript:;", onClick:handleNavigate}, text)
+        React.createElement("li", {className: classes}, 
+          React.createElement("a", {href: "javascript:;", onClick: handleNavigate}, text)
         )
       );
     };
@@ -52,7 +52,7 @@ var SearchPagination = React.createClass({displayName: 'SearchPagination',
       items.push(createItem(i, i));
     }
     items.push(createItem('»', props.pageNum+1));
-    return React.DOM.ul( {className:"pagination"}, items);
+    return React.createElement("ul", {className: "pagination"}, items);
   }
 });
 
@@ -64,11 +64,11 @@ var SearchPagination = React.createClass({displayName: 'SearchPagination',
 var SearchResult = React.createClass({displayName: 'SearchResult',
   render: function() {
     return (
-      React.DOM.li(null, 
-        React.DOM.div( {className:"search-result-title"}, 
-          React.DOM.a( {href:this.props.url}, this.props.title || this.props.url)
-        ),
-        React.DOM.div( {className:"search-result-url"}, 
+      React.createElement("li", null, 
+        React.createElement("div", {className: "search-result-title"}, 
+          React.createElement("a", {href: this.props.url}, this.props.title || this.props.url)
+        ), 
+        React.createElement("div", {className: "search-result-url"}, 
           this.props.url
         )
       )
@@ -84,7 +84,7 @@ var SearchResults = React.createClass({displayName: 'SearchResults',
     getInitialState: function() {
       return { pageNum: 1 };
     },
-    
+
     onPageNavigate : function(n) {
       this.setState({ pageNum: n });
     },
@@ -101,25 +101,25 @@ var SearchResults = React.createClass({displayName: 'SearchResults',
       var pageOfResults = _.map(
         results.slice(offset, offset + this.props.resultsPerPage),
         function(res) {
-          return SearchResult( {title:res.title, url:res.url} );
+          return React.createElement(SearchResult, {title: res.title, url: res.url});
         }
       );
 
       var pagination = null;
       if (pageCount > 1) {
         pagination = (
-          SearchPagination(
-            {pageNum:this.state.pageNum,
-            pageCount:pageCount,
-            onNavigate:this.onPageNavigate}
+          React.createElement(SearchPagination, {
+            pageNum: this.state.pageNum, 
+            pageCount: pageCount, 
+            onNavigate: this.onPageNavigate}
           )
         );
       }
 
       return (
-        React.DOM.div( {className:"search-results"}, 
-          SearchStatus( {count:results.length} ),
-          React.DOM.ul(null, pageOfResults),
+        React.createElement("div", {className: "search-results"}, 
+          React.createElement(SearchStatus, {count: results.length}), 
+          React.createElement("ul", null, pageOfResults), 
           pagination
         )
       );
@@ -148,21 +148,21 @@ var Search = React.createClass({displayName: 'Search',
     var searchResults = null;
     if (this.state.query) {
        searchResults = (
-         SearchResults(
-           {results:this.state.results,
-           resultsPerPage:this.props.resultsPerPage}
+         React.createElement(SearchResults, {
+           results: this.state.results, 
+           resultsPerPage: this.props.resultsPerPage}
          )
        );
     }
     return (
-      React.DOM.div(null, 
-        React.DOM.input(
-          {type:"search",
-          className:"form-control search-query",
-          placeholder:"Search",
-          value:this.state.query,
-          onChange:this.onQueryChange}
-        ),
+      React.createElement("div", null, 
+        React.createElement("input", {
+          type: "search", 
+          className: "form-control search-query", 
+          placeholder: "Search", 
+          value: this.state.query, 
+          onChange: this.onQueryChange}
+        ), 
         searchResults
       )
     );
@@ -178,7 +178,7 @@ function StaticSearchUI(elementOrQuery, searcher, resultsPerPage) {
     elements = [ element ];
   }
   _.each(elements, function(e) {
-    React.renderComponent(Search({
+    React.render(Search({
       searcher: searcher,
       resultsPerPage: resultsPerPage || 10
     }), e);

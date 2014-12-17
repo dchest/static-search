@@ -84,7 +84,7 @@ var SearchResults = React.createClass({
     getInitialState: function() {
       return { pageNum: 1 };
     },
-    
+
     onPageNavigate : function(n) {
       this.setState({ pageNum: n });
     },
@@ -178,7 +178,7 @@ function StaticSearchUI(elementOrQuery, searcher, resultsPerPage) {
     elements = [ element ];
   }
   _.each(elements, function(e) {
-    React.renderComponent(Search({
+    React.render(Search({
       searcher: searcher,
       resultsPerPage: resultsPerPage || 10
     }), e);
