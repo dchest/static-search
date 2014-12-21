@@ -178,9 +178,9 @@ function StaticSearchUI(elementOrQuery, searcher, resultsPerPage) {
     elements = [ element ];
   }
   _.each(elements, function(e) {
-    React.render(Search({
-      searcher: searcher,
-      resultsPerPage: resultsPerPage || 10
-    }), e);
+    React.render(<Search
+        searcher={searcher}
+        resultsPerPage={resultsPerPage || 10}
+      />, e);
   });
 }
