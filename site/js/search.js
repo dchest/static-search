@@ -70,6 +70,8 @@ var StaticSearch = (function() {
     if (!index)
       throw 'Please provide a search index.';
 
+    this._searchIndex = index;
+
     options || (options = {});
 
     this._titleFormat = makeFormatter('title', options.titleFormat);
@@ -88,6 +90,7 @@ var StaticSearch = (function() {
 
   StaticSearch.prototype.search = function(query) {
     var that = this;
+    var searchIndex = this._index;
     var words = _.chain(removeAccents(query).match(/\w{2,}/g) || [])
                  .map(function(s) { return s.toLowerCase(); })
                  .reject(isStopWord)
