@@ -70,7 +70,7 @@ var StaticSearch = (function() {
     if (!index)
       throw 'Please provide a search index.';
 
-    this._searchIndex = index;
+    this._index = index;
 
     options || (options = {});
 
@@ -91,15 +91,35 @@ var StaticSearch = (function() {
   StaticSearch.prototype.search = function(query) {
     var that = this;
     var searchIndex = this._index;
-    var words = _.chain(removeAccents(query).match(/\w{2,}/g) || [])
+    var queryWords = _.chain(removeAccents(query).match(/\w{1,}/g) || [])
                  .map(function(s) { return s.toLowerCase(); })
+                 .value();
+
+    var lastWord = queryWords.pop();
+
+
+    var words = _.chain(queryWords)
                  .reject(isStopWord)
                  .map(stemmer)
                  .value();
-    //console.log('Searching for', words);
 
-    var found = _.pick(searchIndex.words, words);
-    //console.log(found);
+     var found = _.pick(searchIndex.words, words);
+     //console.log(found);
+
+
+    // Consider last word in query a prefix and find the correct
+    // word that matches it among all indexed words.
+    if (lastWord) {
+     var stemmedLastWord = stemmer(lastWord);
+     _.each(searchIndex.words, function(obj, indexWord) {
+       if (indexWord[0] === lastWord[0]) {
+         if (indexWord.indexOf(lastWord) === 0 ||
+             indexWord.indexOf(stemmedLastWord) === 0) {
+           found[indexWord] = obj;
+         }
+       }
+     });
+    }
 
     var docs = {};
     _.each(found, function(arr) {
